@@ -1,0 +1,12 @@
+{
+  "name": "com.shangzhel.raytracer.debug.gui",
+  "version": "1.0.0",
+  "description": "COMP30019 Graphics and Interaction project 1 debugging utilities for Unity.",
+  "displayName": "shangzhel.RayTracer.Debug.Gui",
+  "unity": "2021.1",
+  "author": {
+    "name": "Shang Zhe Lee",
+    "email": "shangzhel@student.unimelb.edu.au"
+  },
+  "license": "MIT"
+}

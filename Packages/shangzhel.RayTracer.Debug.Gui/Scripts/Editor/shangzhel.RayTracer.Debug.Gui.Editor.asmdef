@@ -1,0 +1,18 @@
+{
+    "name": "shangzhel.RayTracer.Debug.Gui.Editor",
+    "rootNamespace": "shangzhel.RayTracer.Debug.Gui.Editor",
+    "references": [
+        "GUID:ae2f26f51bb237d4a9bbffd32f70c6c3"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
