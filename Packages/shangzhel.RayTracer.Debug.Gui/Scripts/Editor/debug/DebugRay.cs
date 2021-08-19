@@ -4,7 +4,7 @@ using SDebug = System.Diagnostics.Debug;
 
 namespace shangzhel.RayTracer.Debug
 {
-    public class DebugRay : IComparable<DebugRay>
+    class DebugRay : IComparable<DebugRay>
     {
         public readonly int[] id;
         public readonly Vector3 from;

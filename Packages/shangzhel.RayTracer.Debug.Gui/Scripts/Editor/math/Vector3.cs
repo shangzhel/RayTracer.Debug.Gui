@@ -5,7 +5,7 @@ namespace RayTracer
     /// <summary>
     /// Immutable structure to represent a three-dimensional vector.
     /// </summary>
-    public readonly struct Vector3
+    readonly struct Vector3
     {
         public readonly static Vector3 zero = new Vector3(0, 0, 0);
         public readonly static Vector3 right = new Vector3(1, 0, 0);

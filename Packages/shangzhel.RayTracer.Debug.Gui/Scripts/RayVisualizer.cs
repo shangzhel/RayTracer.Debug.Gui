@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace shangzhel.RayTracer.Debug.Gui
 {
-    class RayVisualizer : MonoBehaviour
+    public class RayVisualizer : MonoBehaviour
     {
         [SerializeField]
         private RaysAsset asset;
