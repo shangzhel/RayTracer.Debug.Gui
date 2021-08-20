@@ -11,7 +11,7 @@ namespace shangzhel.RayTracer.Debug.Gui
         [SerializeField]
         private GameObject rayPrefab;
 
-        private int itemsPerPage = 20;
+        private int itemsPerPage = 10;
         private int page = 0;
         private int? selected;
         private int? selectedPrev;
