@@ -11,18 +11,28 @@ namespace shangzhel.RayTracer.Debug.Gui
         [SerializeField]
         private GameObject rayPrefab;
 
+        [SerializeField]
+        [Range(1, 100)]
+        private int rayPool = 20;
+
         private int itemsPerPage = 10;
         private int page = 0;
         private int? selected;
         private int? selectedPrev;
-        private Transform ray;
+        private GameObject[] rays;
         private float countdown;
+        private bool selectHierarchy = true;
 
         private const float c_countdown = 0.5f;
 
         private void Start()
         {
-            ray = Instantiate(rayPrefab).transform;
+            rays = new GameObject[rayPool];
+            for (int i = 0; i < rayPool; ++i)
+            {
+                rays[i] = Instantiate(rayPrefab, transform);
+                rays[i].SetActive(false);
+            }
         }
 
         private void Update()
@@ -57,23 +67,23 @@ namespace shangzhel.RayTracer.Debug.Gui
 
                 if (Input.GetKeyDown(KeyCode.DownArrow))
                 {
-                    selected += 1;
+                    SelectNext();
                     countdown = c_countdown;
                 }
 
                 if (Input.GetKeyDown(KeyCode.UpArrow))
                 {
-                    selected -= 1;
+                    SelectPrev();
                     countdown = c_countdown;
                 }
 
                 if (countdown <= 0)
                 {
                     if (Input.GetKey(KeyCode.DownArrow))
-                        selected += 1;
+                        SelectNext();
 
                     if (Input.GetKey(KeyCode.UpArrow))
-                        selected -= 1;
+                        SelectPrev();
                 }
 
                 selected = Mathf.Clamp(selected.Value, 0, asset.hits.Length);
@@ -82,15 +92,42 @@ namespace shangzhel.RayTracer.Debug.Gui
             if (selected != selectedPrev)
             {
                 if (selected is null)
-                    ray.gameObject.SetActive(false);
+                {
+                    for (int i = 0; i < rays.Length; ++i)
+                    {
+                        rays[i].SetActive(false);
+                    }
+                }
                 else
                 {
-                    ray.gameObject.SetActive(true);
-                    var hit = asset.hits[selected.Value];
-                    var path = hit.to - hit.from;
-                    ray.localScale = new Vector3(1, 1, path.magnitude);
-                    ray.localRotation = Quaternion.FromToRotation(Vector3.forward, path);
-                    ray.localPosition = hit.from;
+                    var hits = asset.hits;
+                    var i = selected.Value;
+                    int j = 0;
+                    for (; j < rays.Length && i + j < hits.Length; ++j)
+                    {
+                        var hit = hits[i + j];
+
+                        if (selectHierarchy && !IsChild(hits[i].id, hits[i + j].id))
+                            break;
+
+                        rays[j].SetActive(true);
+                        var ray = rays[j].transform;
+                        var path = hit.to - hit.from;
+                        ray.localScale = new Vector3(1, 1, path.magnitude);
+                        ray.localRotation = Quaternion.FromToRotation(Vector3.forward, path);
+                        ray.localPosition = hit.from;
+
+                        if (!selectHierarchy)
+                        {
+                            ++j;
+                            break;
+                        }
+                    }
+
+                    for (; j < rays.Length && rays[j].activeSelf; ++j)
+                    {
+                        rays[j].SetActive(false);
+                    }
                 }
             }
 
@@ -128,7 +165,9 @@ namespace shangzhel.RayTracer.Debug.Gui
             GUILayout.EndHorizontal();
 
             var hits = asset.hits;
-            GUILayout.Box(selected is null ? "None selected" : IdToString(hits[selected.Value].id));
+            GUILayout.Box(selected is null ? "None selected" : IdToString(hits[selected.Value].id, false));
+
+            selectHierarchy = GUILayout.Toggle(selectHierarchy, "Select hierarchy");
 
             var offset = page * itemsPerPage;
             for (int i = 0; i < itemsPerPage; ++i)
@@ -139,7 +178,9 @@ namespace shangzhel.RayTracer.Debug.Gui
 
                 var id = hits[idx].id;
                 var value = selected.HasValue && selected.Value == idx;
-                if (GUILayout.Toggle(value, IdToString(id)))
+                var showChecked = selectHierarchy && selected.HasValue && selected.Value != idx && IsChild(hits[selected.Value].id, id) && i < rays.Length;
+
+                if (GUILayout.Toggle(value, IdToString(id, showChecked)))
                 {
                     if (!value)
                         selected = idx;
@@ -158,9 +199,51 @@ namespace shangzhel.RayTracer.Debug.Gui
                 selected = Mathf.Clamp(selected.Value, 0, asset.hits.Length);
         }
 
-        private static string IdToString(int[] id)
+        private void SelectPrev()
+        {
+            UnityEngine.Debug.Assert(selected.HasValue, "selected.HasValue");
+
+            if (!selectHierarchy)
+            {
+                --selected;
+                return;
+            }
+
+            var hits = asset.hits;
+            var j = selected.Value;
+            var i = j - 1;
+            for (; i > 0 && hits[i].id.Length > hits[j].id.Length; --i) { }
+
+            if (i < 0)
+                i = 0;
+            selected = i;
+        }
+
+        private void SelectNext()
+        {
+            UnityEngine.Debug.Assert(selected.HasValue, "selected.HasValue");
+
+            if (!selectHierarchy)
+            {
+                ++selected;
+                return;
+            }
+
+            var hits = asset.hits;
+            var j = selected.Value;
+            var i = j + 1;
+            for (; i < hits.Length && IsChild(hits[j].id, hits[i].id); ++i) { }
+
+            if (i >= hits.Length)
+                return;
+            selected = i;
+        }
+
+        private static string IdToString(int[] id, bool showChecked)
         {
             var sb = new StringBuilder();
+            if (showChecked)
+                sb.Append('*');
             sb.Append('[');
             for (int i = 0; i < id.Length; ++i)
             {
@@ -170,6 +253,20 @@ namespace shangzhel.RayTracer.Debug.Gui
             if (sb[sb.Length - 1] is ',')
                 sb[sb.Length - 1] = ']';
             return sb.ToString();
+        }
+
+        private static bool IsChild(int[] pid, int[] cid)
+        {
+            for (int i = 0; i < pid.Length; ++i)
+            {
+                if (i >= cid.Length)
+                    return false;
+
+                if (pid[i] != cid[i])
+                    return false;
+            }
+
+            return true;
         }
     }
 }
