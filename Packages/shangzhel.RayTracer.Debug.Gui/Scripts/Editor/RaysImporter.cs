@@ -6,6 +6,10 @@ using Vector3_ = RayTracer.Vector3;
 
 namespace shangzhel.RayTracer.Debug.Gui.Editor
 {
+    /// <summary>
+    /// Imports ray dump files with the <c>.rays</c> extension as <see cref="RaysAsset"/>s
+    /// consumable by <see cref="RayVisualizer"/>s.
+    /// </summary>
     [ScriptedImporter(1, new string[] { "rays" })]
     class RaysImporter : ScriptedImporter
     {

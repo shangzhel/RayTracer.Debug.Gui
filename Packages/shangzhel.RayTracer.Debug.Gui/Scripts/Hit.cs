@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace shangzhel.RayTracer.Debug.Gui
 {
+    /// <summary>
+    /// Represents a recorded ray.
+    /// </summary>
     [Serializable]
     public class Hit
     {

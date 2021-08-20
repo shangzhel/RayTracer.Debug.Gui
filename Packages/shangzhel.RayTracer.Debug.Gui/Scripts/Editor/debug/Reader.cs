@@ -4,8 +4,16 @@ using System.Text;
 
 namespace shangzhel.RayTracer.Debug
 {
+    /// <summary>
+    /// Implements a function to interpret dumped rays.
+    /// </summary>
     class Reader
     {
+        /// <summary>
+        /// Deserializes collected rays from a <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <returns>Rays collected previously.</returns>
         public static DebugRay[] ReadFromStream(Stream stream)
         {
             using var reader = new BinaryReader(stream, Encoding.UTF8, true);

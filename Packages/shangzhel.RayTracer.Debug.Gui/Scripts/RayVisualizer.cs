@@ -3,16 +3,26 @@ using UnityEngine;
 
 namespace shangzhel.RayTracer.Debug.Gui
 {
+    /// <summary>
+    /// A component that visualizes recorded rays in 3D space and draws a GUI to select which rays are visualized.
+    /// </summary>
+    /// <remarks>
+    /// For the rays to be visualized correctly, the <see cref="GameObject"/> that this component is attached to
+    /// should be positioned at world origin, have no rotation, and its scale be identity.
+    /// </remarks>
     public class RayVisualizer : MonoBehaviour
     {
         [SerializeField]
+        [Tooltip("The collection of recorded rays to visualize.")]
         private RaysAsset asset;
 
         [SerializeField]
+        [Tooltip("The template to represent a ray.")]
         private GameObject rayPrefab;
 
         [SerializeField]
         [Range(1, 100)]
+        [Tooltip("The maximum number of rays to represent at one time.")]
         private int rayPool = 20;
 
         private int itemsPerPage = 10;

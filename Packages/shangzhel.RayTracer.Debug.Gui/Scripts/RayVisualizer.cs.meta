@@ -3,7 +3,9 @@ guid: e52685f61252c184f9d636c34497ec8c
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - asset: {instanceID: 0}
+  - rayPrefab: {fileID: 5630970666060405797, guid: a14fe7365fb2c084582f9c46e95ab5f2, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
